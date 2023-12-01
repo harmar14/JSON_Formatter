@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter with Drop-down Tree</title>
+    <style>
+	ul {
+		list-style-type: circle;
+	}
+	input {
+		
+	}
+    </style>
+</head>
+<body>
+
+<div>
+    <input type="checkbox" id="toggle-tree" checked>
+    <label for="toggle-tree">Toggle Tree</label>
+    <ul class="tree" id="json-tree">
+        <!-- Tree structure will be dynamically added here -->
+    </ul>
+</div>
+
+<script>
+    let json_string = <PUT YOUR JSON HERE>;
+    const jsonData = JSON.parse(json_string);
+    
+    // Function to convert JSON object to an HTML tree structure
+    function jsonToTree(obj, parentNode) {
+        const ul = document.createElement("ul");
+        for (const key in obj) {
+            const li = document.createElement("li");
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            const label = document.createElement("label");
+            label.textContent = key;
+
+            li.appendChild(input);
+            li.appendChild(label);
+
+            if (typeof obj[key] === "object") {
+                li.appendChild(document.createElement("ul"));
+                // Add event listener to dynamically create sub-tree when the button is clicked
+                input.addEventListener("change", function () {
+                    if (input.checked) {
+                        jsonToTree(obj[key], li.lastElementChild);
+                    } else {
+                        li.lastElementChild.innerHTML = '';
+                    }
+                });
+            } else {
+                li.textContent = `${key}: ${obj[key]}`;
+            }
+            ul.appendChild(li);
+        }
+        parentNode.appendChild(ul);
+        return ul;
+    }
+
+    // Initialize the tree with JSON data
+    const treeContainer = document.getElementById("json-tree");
+    jsonToTree(jsonData, treeContainer);
+
+    // Add event listener to toggle tree visibility
+    document.getElementById("toggle-tree").addEventListener("change", function () {
+        treeContainer.style.display = this.checked ? "block" : "none";
+    });
+</script>
+
+</body>
+</html>
